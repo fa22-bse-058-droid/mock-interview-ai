@@ -6,7 +6,7 @@ type SpeechHandlerProps = {
 }
 
 const SpeechHandler = ({ onTranscript }: SpeechHandlerProps) => {
-  const { supported, listening, transcript, startListening, stopListening } = useSpeech()
+  const { supported, isListening, transcript, startListening, stopListening } = useSpeech()
 
   useEffect(() => {
     onTranscript(transcript)
@@ -17,7 +17,7 @@ const SpeechHandler = ({ onTranscript }: SpeechHandlerProps) => {
   return (
     <div className="flex gap-2">
       <button className="rounded bg-emerald-600 px-3 py-2 text-sm" onClick={startListening}>
-        {listening ? 'Listening…' : 'Start'}
+        {isListening ? 'Listening…' : 'Start'}
       </button>
       <button className="rounded bg-rose-600 px-3 py-2 text-sm" onClick={stopListening}>
         Stop
