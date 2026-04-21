@@ -35,6 +35,8 @@ const questionLibrary: Record<string, string[]> = {
   ],
 }
 
+const seededValue = (seed: number) => ((seed * 9301 + 49297) % 233280) / 233280
+
 const InterviewSetupPage = () => {
   const navigate = useNavigate()
   const startSession = useInterviewStore((state) => state.startSession)
@@ -49,10 +51,10 @@ const InterviewSetupPage = () => {
     () =>
       Array.from({ length: 18 }).map((_, index) => ({
         id: index,
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        delay: Math.random() * 2,
-        duration: 3 + Math.random() * 4,
+        left: `${seededValue(index + 11) * 100}%`,
+        top: `${seededValue(index + 37) * 100}%`,
+        delay: seededValue(index + 71) * 2,
+        duration: 3 + seededValue(index + 101) * 4,
       })),
     [],
   )

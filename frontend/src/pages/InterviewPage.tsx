@@ -122,7 +122,6 @@ const InterviewPage = () => {
   useEffect(() => {
     if (!currentQuestionText) return
     resetTranscript()
-    setTimeLeft(QUESTION_DURATION_SECONDS)
     speakQuestion(currentQuestionText)
   }, [currentQuestionText, resetTranscript, speakQuestion])
 
@@ -137,7 +136,7 @@ const InterviewPage = () => {
     }, 1000)
 
     return () => window.clearInterval(timer)
-  }, [timeLeft, stopListening])
+  }, [stopListening, timeLeft])
 
   const handleFaceUpdate = useCallback(
     (faceData: {
@@ -197,7 +196,9 @@ const InterviewPage = () => {
     const next = nextQuestion()
     if (next.completed) {
       finishInterview([...allAnswers, answer])
+      return
     }
+    setTimeLeft(QUESTION_DURATION_SECONDS)
   }
 
   const skipCurrentQuestion = () => {
@@ -209,10 +210,15 @@ const InterviewPage = () => {
     const next = nextQuestion()
     if (next.completed) {
       finishInterview([...allAnswers, answer])
+      return
     }
+    setTimeLeft(QUESTION_DURATION_SECONDS)
   }
 
-  const formattedTime = useMemo(() => `${String(Math.floor(timeLeft / 60)).padStart(2, '0')}:${String(timeLeft % 60).padStart(2, '0')}`, [timeLeft])
+  const formattedTime = useMemo(
+    () => `${String(Math.floor(timeLeft / 60)).padStart(2, '0')}:${String(timeLeft % 60).padStart(2, '0')}`,
+    [timeLeft],
+  )
 
   return (
     <div className="min-h-screen bg-[#0A0F1E] px-4 py-6 text-[#F9FAFB]">

@@ -23,7 +23,6 @@ const ReportPage = () => {
 
   useEffect(() => {
     if (!finalReport) return
-    setDisplayScore(0)
     const target = finalReport.overallScore
     const step = Math.max(1, Math.ceil(target / 40))
     const timer = window.setInterval(() => {
