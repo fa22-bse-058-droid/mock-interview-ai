@@ -7,6 +7,7 @@ import { useSpeech } from '../hooks/useSpeech'
 import { type AnswerRecord, type FinalReport, useInterviewStore } from '../store/interviewStore'
 
 const QUESTION_DURATION_SECONDS = 90
+const FIRST_QUESTION_SPEAK_DELAY_MS = 300
 
 const extractKeywords = (question: string) =>
   question
@@ -122,7 +123,11 @@ const InterviewPage = () => {
   useEffect(() => {
     if (!currentQuestionText) return
     resetTranscript()
-    speakQuestion(currentQuestionText)
+    const timeoutId = window.setTimeout(() => {
+      speakQuestion(currentQuestionText)
+    }, FIRST_QUESTION_SPEAK_DELAY_MS)
+
+    return () => window.clearTimeout(timeoutId)
   }, [currentQuestionText, resetTranscript, speakQuestion])
 
   useEffect(() => {

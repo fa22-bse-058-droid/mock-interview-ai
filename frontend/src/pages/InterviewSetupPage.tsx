@@ -38,6 +38,7 @@ const questionLibrary: Record<string, string[]> = {
 const PARTICLE_SEED_MULTIPLIER = 9301
 const PARTICLE_SEED_INCREMENT = 49297
 const PARTICLE_SEED_MODULUS = 233280
+const SPEECH_WARMUP_TIMEOUT_MS = 350
 
 const seededValue = (seed: number) =>
   ((seed * PARTICLE_SEED_MULTIPLIER + PARTICLE_SEED_INCREMENT) % PARTICLE_SEED_MODULUS) / PARTICLE_SEED_MODULUS
@@ -64,21 +65,37 @@ const InterviewSetupPage = () => {
     [],
   )
 
-  const warmUpSpeech = () => {
+  const warmUpSpeech = async () => {
     if (!('speechSynthesis' in window)) return
-    try {
-      window.speechSynthesis.cancel()
-      const utterance = new SpeechSynthesisUtterance('Starting interview.')
-      utterance.rate = 1.1
-      utterance.volume = 0.2
-      window.speechSynthesis.speak(utterance)
-    } catch {
-      // Ignore speech warm-up errors; interview can still proceed.
-    }
+    await new Promise<void>((resolve) => {
+      let resolved = false
+      let timeoutId: number | null = null
+      const finish = () => {
+        if (resolved) return
+        resolved = true
+        if (timeoutId) window.clearTimeout(timeoutId)
+        resolve()
+      }
+
+      try {
+        window.speechSynthesis.cancel()
+        window.speechSynthesis.resume()
+        const utterance = new SpeechSynthesisUtterance('Starting interview.')
+        utterance.rate = 1
+        utterance.pitch = 1
+        utterance.volume = 0.05
+        utterance.onend = finish
+        utterance.onerror = finish
+        window.speechSynthesis.speak(utterance)
+        timeoutId = window.setTimeout(finish, SPEECH_WARMUP_TIMEOUT_MS)
+      } catch {
+        finish()
+      }
+    })
   }
 
-  const handleStart = () => {
-    warmUpSpeech()
+  const handleStart = async () => {
+    await warmUpSpeech()
     const roundTitles = mode === 'quick' ? ['OOP & Programming'] : Object.keys(questionLibrary)
     const questionsByRound = roundTitles.map((title) => questionLibrary[title])
 
