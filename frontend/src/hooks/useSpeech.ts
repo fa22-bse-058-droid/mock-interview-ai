@@ -87,8 +87,28 @@ export const useSpeech = (options: SpeechOptions = {}) => {
     setSilencePrompt('')
   }, [])
 
+  const getVoices = useCallback(async () => {
+    const voices = window.speechSynthesis.getVoices() as SpeechSynthesisVoiceLike[]
+    if (voices.length > 0) return voices
+
+    return await new Promise<SpeechSynthesisVoiceLike[]>((resolve) => {
+      const previousVoicesChanged = window.speechSynthesis.onvoiceschanged
+      const timeoutId = window.setTimeout(() => {
+        window.speechSynthesis.onvoiceschanged = previousVoicesChanged
+        resolve(window.speechSynthesis.getVoices() as SpeechSynthesisVoiceLike[])
+      }, 1000)
+
+      window.speechSynthesis.onvoiceschanged = (event) => {
+        window.clearTimeout(timeoutId)
+        window.speechSynthesis.onvoiceschanged = previousVoicesChanged
+        if (previousVoicesChanged) previousVoicesChanged.call(window.speechSynthesis, event)
+        resolve(window.speechSynthesis.getVoices() as SpeechSynthesisVoiceLike[])
+      }
+    })
+  }, [])
+
   const speakQuestion = useCallback(
-    (text: string, onEnd?: () => void) => {
+    async (text: string, onEnd?: () => void) => {
       if (!('speechSynthesis' in window)) {
         startListening()
         onEnd?.()
@@ -97,7 +117,7 @@ export const useSpeech = (options: SpeechOptions = {}) => {
 
       window.speechSynthesis.cancel()
       const utterance = new SpeechSynthesisUtterance(text)
-      const voices = window.speechSynthesis.getVoices() as SpeechSynthesisVoiceLike[]
+      const voices = await getVoices()
       const femaleVoice = voices.find((voice) => /female|zira|susan|samantha|victoria/i.test(voice.name))
       const fallbackEnglishVoice = voices.find((voice) => /^en/i.test(voice.lang))
       const selectedVoice = femaleVoice || fallbackEnglishVoice
@@ -118,7 +138,7 @@ export const useSpeech = (options: SpeechOptions = {}) => {
 
       window.speechSynthesis.speak(utterance)
     },
-    [startListening],
+    [getVoices, startListening],
   )
 
   useEffect(() => {
