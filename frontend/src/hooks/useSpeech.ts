@@ -39,6 +39,7 @@ export const useSpeech = (options: SpeechOptions = {}) => {
   const silenceTimerRef = useRef<number | null>(null)
   const timeLimitTimerRef = useRef<number | null>(null)
   const latestTranscriptRef = useRef('')
+  const speakRequestIdRef = useRef(0)
 
   const supported = useMemo(() => {
     const speechWindow = window as {
@@ -115,30 +116,39 @@ export const useSpeech = (options: SpeechOptions = {}) => {
         return
       }
 
+      stopListening()
+      speakRequestIdRef.current += 1
+      const requestId = speakRequestIdRef.current
+
       window.speechSynthesis.cancel()
-      const utterance = new SpeechSynthesisUtterance(text)
       const voices = await getVoices()
-      const femaleVoice = voices.find((voice) => /female|zira|susan|samantha|victoria/i.test(voice.name))
-      const fallbackEnglishVoice = voices.find((voice) => /^en/i.test(voice.lang))
-      const selectedVoice = femaleVoice || fallbackEnglishVoice
+      const utterance = new SpeechSynthesisUtterance(text)
+      const englishVoices = voices.filter((voice) => /^en(-|_)?/i.test(voice.lang))
+      const femaleEnglishVoice = englishVoices.find((voice) =>
+        /female|zira|susan|samantha|victoria|karen|moira|tessa|veena|amy|joanna/i.test(voice.name),
+      )
+      const fallbackEnglishVoice = englishVoices[0]
+      const selectedVoice = femaleEnglishVoice || fallbackEnglishVoice
       if (selectedVoice) utterance.voice = selectedVoice as unknown as SpeechSynthesisVoice
       utterance.rate = 0.85
       utterance.pitch = 1.1
 
       setIsSpeaking(true)
       utterance.onend = () => {
+        if (requestId !== speakRequestIdRef.current) return
         setIsSpeaking(false)
         startListening()
         onEnd?.()
       }
       utterance.onerror = () => {
+        if (requestId !== speakRequestIdRef.current) return
         setIsSpeaking(false)
         startListening()
       }
 
       window.speechSynthesis.speak(utterance)
     },
-    [getVoices, startListening],
+    [getVoices, startListening, stopListening],
   )
 
   useEffect(() => {
