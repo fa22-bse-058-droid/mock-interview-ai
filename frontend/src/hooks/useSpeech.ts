@@ -21,6 +21,7 @@ type SpeechRecognitionType = {
 type SpeechSynthesisVoiceLike = {
   lang: string
   name: string
+  default?: boolean
 }
 
 type SpeechOptions = {
@@ -36,10 +37,24 @@ export const useSpeech = (options: SpeechOptions = {}) => {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [silencePrompt, setSilencePrompt] = useState('')
   const recognitionRef = useRef<SpeechRecognitionType | null>(null)
+  const speechDebugRef = useRef(false)
   const silenceTimerRef = useRef<number | null>(null)
   const timeLimitTimerRef = useRef<number | null>(null)
   const latestTranscriptRef = useRef('')
   const speakRequestIdRef = useRef(0)
+
+  useEffect(() => {
+    speechDebugRef.current = window.localStorage.getItem('speech-debug') === 'true'
+  }, [])
+
+  const logSpeech = useCallback((message: string, extra?: Record<string, unknown>) => {
+    if (!speechDebugRef.current) return
+    if (extra) {
+      console.info(`[speech] ${message}`, extra)
+      return
+    }
+    console.info(`[speech] ${message}`)
+  }, [])
 
   const supported = useMemo(() => {
     const speechWindow = window as {
@@ -93,18 +108,24 @@ export const useSpeech = (options: SpeechOptions = {}) => {
     if (voices.length > 0) return voices
 
     return await new Promise<SpeechSynthesisVoiceLike[]>((resolve) => {
-      const previousVoicesChanged = window.speechSynthesis.onvoiceschanged
+      const synth = window.speechSynthesis
+      let resolved = false
       const timeoutId = window.setTimeout(() => {
-        window.speechSynthesis.onvoiceschanged = previousVoicesChanged
-        resolve(window.speechSynthesis.getVoices() as SpeechSynthesisVoiceLike[])
+        if (resolved) return
+        resolved = true
+        synth.removeEventListener('voiceschanged', handleVoicesChanged)
+        resolve(synth.getVoices() as SpeechSynthesisVoiceLike[])
       }, 1000)
 
-      window.speechSynthesis.onvoiceschanged = (event) => {
+      const handleVoicesChanged = () => {
+        if (resolved) return
+        resolved = true
         window.clearTimeout(timeoutId)
-        window.speechSynthesis.onvoiceschanged = previousVoicesChanged
-        if (previousVoicesChanged) previousVoicesChanged.call(window.speechSynthesis, event)
-        resolve(window.speechSynthesis.getVoices() as SpeechSynthesisVoiceLike[])
+        synth.removeEventListener('voiceschanged', handleVoicesChanged)
+        resolve(synth.getVoices() as SpeechSynthesisVoiceLike[])
       }
+
+      synth.addEventListener('voiceschanged', handleVoicesChanged, { once: true })
     })
   }, [])
 
@@ -121,34 +142,42 @@ export const useSpeech = (options: SpeechOptions = {}) => {
       const requestId = speakRequestIdRef.current
 
       window.speechSynthesis.cancel()
+      window.speechSynthesis.resume()
       const voices = await getVoices()
+      if (requestId !== speakRequestIdRef.current) return
+
       const utterance = new SpeechSynthesisUtterance(text)
       const englishVoices = voices.filter((voice) => /^en(-|_)?/i.test(voice.lang))
-      const femaleEnglishVoice = englishVoices.find((voice) =>
-        /female|zira|susan|samantha|victoria|karen|moira|tessa|veena|amy|joanna/i.test(voice.name),
-      )
-      const fallbackEnglishVoice = englishVoices[0]
-      const selectedVoice = femaleEnglishVoice || fallbackEnglishVoice
+      const defaultEnglishVoice = englishVoices.find((voice) => voice.default)
+      const selectedVoice = defaultEnglishVoice || englishVoices[0]
       if (selectedVoice) utterance.voice = selectedVoice as unknown as SpeechSynthesisVoice
       utterance.rate = 0.85
       utterance.pitch = 1.1
+      logSpeech('Preparing utterance', {
+        voicesCount: voices.length,
+        englishVoicesCount: englishVoices.length,
+        selectedVoice: selectedVoice?.name ?? 'browser-default',
+      })
 
       setIsSpeaking(true)
       utterance.onend = () => {
         if (requestId !== speakRequestIdRef.current) return
         setIsSpeaking(false)
+        logSpeech('Utterance ended')
         startListening()
         onEnd?.()
       }
       utterance.onerror = () => {
         if (requestId !== speakRequestIdRef.current) return
         setIsSpeaking(false)
+        logSpeech('Utterance error')
         startListening()
       }
 
       window.speechSynthesis.speak(utterance)
+      logSpeech('Utterance started')
     },
-    [getVoices, startListening, stopListening],
+    [getVoices, logSpeech, startListening, stopListening],
   )
 
   useEffect(() => {

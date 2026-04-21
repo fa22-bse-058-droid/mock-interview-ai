@@ -122,7 +122,11 @@ const InterviewPage = () => {
   useEffect(() => {
     if (!currentQuestionText) return
     resetTranscript()
-    speakQuestion(currentQuestionText)
+    const timeoutId = window.setTimeout(() => {
+      speakQuestion(currentQuestionText)
+    }, 300)
+
+    return () => window.clearTimeout(timeoutId)
   }, [currentQuestionText, resetTranscript, speakQuestion])
 
   useEffect(() => {
