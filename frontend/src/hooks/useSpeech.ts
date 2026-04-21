@@ -148,8 +148,11 @@ export const useSpeech = (options: SpeechOptions = {}) => {
 
       const utterance = new SpeechSynthesisUtterance(text)
       const englishVoices = voices.filter((voice) => /^en(-|_)?/i.test(voice.lang))
+      const preferredEnglishVoice = englishVoices.find((voice) =>
+        /female|zira|susan|samantha|victoria|karen|moira|tessa|veena|amy|joanna/i.test(voice.name),
+      )
       const defaultEnglishVoice = englishVoices.find((voice) => voice.default)
-      const selectedVoice = defaultEnglishVoice || englishVoices[0]
+      const selectedVoice = preferredEnglishVoice || defaultEnglishVoice || englishVoices[0]
       if (selectedVoice) utterance.voice = selectedVoice as unknown as SpeechSynthesisVoice
       utterance.rate = 0.85
       utterance.pitch = 1.1
