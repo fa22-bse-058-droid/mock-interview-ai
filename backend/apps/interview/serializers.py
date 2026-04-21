@@ -1,33 +1,40 @@
 from rest_framework import serializers
 
-from .models import AnswerEvaluation, InterviewSession
+from .models import InterviewAnswer, InterviewSession
 
 
 class InterviewSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterviewSession
-        fields = ['id', 'role', 'level', 'created_at']
-
-
-class AnswerEvaluationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AnswerEvaluation
-        fields = [
-            'id',
-            'session',
-            'question',
-            'answer',
-            'relevance_score',
-            'confidence_score',
-            'eye_contact_score',
-            'overall_score',
-            'feedback',
-            'created_at',
-        ]
+        fields = '__all__'
         read_only_fields = [
-            'relevance_score',
-            'confidence_score',
+            'session_id',
+            'status',
+            'current_round',
+            'round1_score',
+            'round2_score',
+            'round3_score',
             'overall_score',
-            'feedback',
-            'created_at',
+            'communication_score',
+            'technical_score',
+            'confidence_score',
+            'started_at',
+            'completed_at',
+            'strengths',
+            'weaknesses',
+            'improvement_plan',
+        ]
+
+
+class InterviewAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InterviewAnswer
+        fields = '__all__'
+        read_only_fields = [
+            'score',
+            'keywords_matched',
+            'keywords_missed',
+            'ai_feedback',
+            'hesitation_count',
+            'answered_at',
         ]
