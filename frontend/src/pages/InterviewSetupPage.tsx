@@ -144,7 +144,7 @@ const InterviewSetupPage = () => {
                 <button
                   key={option.key}
                   onClick={() => setDifficulty(option.key)}
-                  className={`rounded-2xl border p-4 text-left transition-all duration-300 hover:scale-[1.02] ${difficulty === option.key ? 'border-[#00D4FF] bg-[#00D4FF]/10 shadow-[0_0_30px_rgba[...]}
+                  className={`rounded-2xl border p-4 text-left transition-all duration-300 hover:scale-[1.02] ${difficulty === option.key ? 'border-[#00D4FF] bg-[#00D4FF]/10 shadow-[0_0_30px_rgba(0,212,255,0.25)]' : 'border-white/10 bg-white/5'}`}
                 >
                   <p className="text-lg">{option.icon}</p>
                   <p className="mt-2 font-semibold">{option.title}</p>
@@ -159,12 +159,14 @@ const InterviewSetupPage = () => {
             <div className="mt-3 flex items-center rounded-full border border-white/10 bg-[#0A0F1E] p-1">
               <button
                 onClick={() => setMode('full')}
-                className={`flex-1 rounded-full px-4 py-2 text-sm transition-all duration-300 ${mode === 'full' ? 'bg-[#00D4FF] text-[#0A0F1E]' : 'text-slate-300'}`}>
+                className={`flex-1 rounded-full px-4 py-2 text-sm transition-all duration-300 ${mode === 'full' ? 'bg-[#00D4FF] text-[#0A0F1E]' : 'text-slate-300'}`}
+              >
                 Full Interview (all 3 rounds)
               </button>
               <button
                 onClick={() => setMode('quick')}
-                className={`flex-1 rounded-full px-4 py-2 text-sm transition-all duration-300 ${mode === 'quick' ? 'bg-[#7C3AED] text-white' : 'text-slate-300'}`}>
+                className={`flex-1 rounded-full px-4 py-2 text-sm transition-all duration-300 ${mode === 'quick' ? 'bg-[#7C3AED] text-white' : 'text-slate-300'}`}
+              >
                 Quick Mode (1 round)
               </button>
             </div>
@@ -172,7 +174,7 @@ const InterviewSetupPage = () => {
 
           <button
             onClick={handleStart}
-            className="w-full rounded-xl bg-gradient-to-r from-[#00D4FF] to-[#7C3AED] px-5 py-3 font-semibold text-[#0A0F1E] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_35px_[...]}
+            className="w-full rounded-xl bg-gradient-to-r from-[#00D4FF] to-[#7C3AED] px-5 py-3 font-semibold text-[#0A0F1E] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(124,58,237,0.35)]"
           >
             <motion.span animate={{ opacity: [1, 0.8, 1] }} transition={{ repeat: Infinity, duration: 1.5 }}>
               Start Interview
