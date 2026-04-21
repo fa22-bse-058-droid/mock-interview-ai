@@ -1,9 +1,17 @@
 from django.urls import path
 
-from .views import EvaluateAnswerView, InterviewReportView, QuestionListView
+from .views import (
+    CompleteInterviewView,
+    InterviewReportView,
+    NextQuestionView,
+    StartInterviewView,
+    SubmitAnswerView,
+)
 
 urlpatterns = [
-    path('questions/', QuestionListView.as_view(), name='question-list'),
-    path('evaluate/', EvaluateAnswerView.as_view(), name='evaluate-answer'),
-    path('report/', InterviewReportView.as_view(), name='interview-report'),
+    path('start/', StartInterviewView.as_view(), name='start-interview'),
+    path('<uuid:id>/next-question/', NextQuestionView.as_view(), name='next-question'),
+    path('<uuid:id>/submit-answer/', SubmitAnswerView.as_view(), name='submit-answer'),
+    path('<uuid:id>/complete/', CompleteInterviewView.as_view(), name='complete-interview'),
+    path('<uuid:id>/report/', InterviewReportView.as_view(), name='interview-report'),
 ]
