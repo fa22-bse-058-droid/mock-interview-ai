@@ -1,3 +1,6 @@
+from collections import Counter
+
+
 class AnswerEvaluator:
     def evaluate_answer(self, question_data, answer_text, time_taken):
         if not answer_text or len(answer_text.strip()) < 10:
@@ -106,8 +109,6 @@ class AnswerEvaluator:
         all_missed = []
         for answer in all_answers:
             all_missed.extend(answer.keywords_missed)
-
-        from collections import Counter
 
         top_missed = [kw for kw, _ in Counter(all_missed).most_common(5)]
 
