@@ -30,6 +30,9 @@ type SpeechOptions = {
   onTimeLimit?: () => void
 }
 
+const SPEECH_DEBUG_STORAGE_KEY = 'speech-debug'
+const VOICES_LOAD_TIMEOUT_MS = 1000
+
 export const useSpeech = (options: SpeechOptions = {}) => {
   const { maxListeningMs = 90000, onSilence, onTimeLimit } = options
   const [transcript, setTranscript] = useState('')
@@ -44,7 +47,7 @@ export const useSpeech = (options: SpeechOptions = {}) => {
   const speakRequestIdRef = useRef(0)
 
   useEffect(() => {
-    speechDebugRef.current = window.localStorage.getItem('speech-debug') === 'true'
+    speechDebugRef.current = window.localStorage.getItem(SPEECH_DEBUG_STORAGE_KEY) === 'true'
   }, [])
 
   const logSpeech = useCallback((message: string, extra?: Record<string, unknown>) => {
@@ -115,7 +118,7 @@ export const useSpeech = (options: SpeechOptions = {}) => {
         resolved = true
         synth.removeEventListener('voiceschanged', handleVoicesChanged)
         resolve(synth.getVoices() as SpeechSynthesisVoiceLike[])
-      }, 1000)
+      }, VOICES_LOAD_TIMEOUT_MS)
 
       const handleVoicesChanged = () => {
         if (resolved) return
