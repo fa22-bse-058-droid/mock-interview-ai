@@ -157,7 +157,7 @@ export const useSpeech = (options: SpeechOptions = {}) => {
       const defaultEnglishVoice = englishVoices.find((voice) => voice.default)
       const selectedVoice = preferredEnglishVoice || defaultEnglishVoice || englishVoices[0]
       if (!selectedVoice) {
-        logSpeech('No English voice available; using browser default voice')
+        logSpeech('No English voice available, using browser default voice')
       }
       if (selectedVoice) utterance.voice = selectedVoice as unknown as SpeechSynthesisVoice
       utterance.rate = 0.85
