@@ -12,6 +12,7 @@ type FaceDetectionState = {
 }
 
 const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/'
+const EYE_CONTACT_TOLERANCE = 0.1
 
 const getDominantExpression = (expressions: faceapi.FaceExpressions | undefined) => {
   if (!expressions) return { expression: 'neutral', confidenceLevel: 0 }
@@ -25,7 +26,7 @@ const getEyeContact = (detection: faceapi.WithFaceExpressions<faceapi.WithFaceLa
   const centerX = box.x + box.width / 2
   const nose = detection.landmarks.getNose()[3]
   const horizontalDiffRatio = Math.abs(nose.x - centerX) / box.width
-  return horizontalDiffRatio < 0.1 ? 'good' : 'poor'
+  return horizontalDiffRatio < EYE_CONTACT_TOLERANCE ? 'good' : 'poor'
 }
 
 export const useFaceDetection = (videoRef: React.RefObject<HTMLVideoElement>) => {

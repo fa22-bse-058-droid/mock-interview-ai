@@ -99,7 +99,9 @@ export const useSpeech = (options: SpeechOptions = {}) => {
       const utterance = new SpeechSynthesisUtterance(text)
       const voices = window.speechSynthesis.getVoices() as SpeechSynthesisVoiceLike[]
       const femaleVoice = voices.find((voice) => /female|zira|susan|samantha|victoria/i.test(voice.name))
-      if (femaleVoice) utterance.voice = femaleVoice as unknown as SpeechSynthesisVoice
+      const fallbackEnglishVoice = voices.find((voice) => /^en/i.test(voice.lang))
+      const selectedVoice = femaleVoice || fallbackEnglishVoice
+      if (selectedVoice) utterance.voice = selectedVoice as unknown as SpeechSynthesisVoice
       utterance.rate = 0.85
       utterance.pitch = 1.1
 

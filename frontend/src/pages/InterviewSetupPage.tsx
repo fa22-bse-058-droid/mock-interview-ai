@@ -35,7 +35,12 @@ const questionLibrary: Record<string, string[]> = {
   ],
 }
 
-const seededValue = (seed: number) => ((seed * 9301 + 49297) % 233280) / 233280
+const PARTICLE_SEED_MULTIPLIER = 9301
+const PARTICLE_SEED_INCREMENT = 49297
+const PARTICLE_SEED_MODULUS = 233280
+
+const seededValue = (seed: number) =>
+  ((seed * PARTICLE_SEED_MULTIPLIER + PARTICLE_SEED_INCREMENT) % PARTICLE_SEED_MODULUS) / PARTICLE_SEED_MODULUS
 
 const InterviewSetupPage = () => {
   const navigate = useNavigate()

@@ -39,7 +39,7 @@ const buildFinalReport = (answers: AnswerRecord[], eyeContactPercentage: number)
   const rounds = Array.from(roundsMap.entries()).map(([round, items]) => ({
     round,
     title: roundTitles[round - 1] || `Round ${round}`,
-    score: Math.round(items.reduce((sum, item) => sum + item.score, 0) / items.length),
+    score: Math.round(items.length === 0 ? 0 : items.reduce((sum, item) => sum + item.score, 0) / items.length),
     questions: items,
   }))
 
@@ -165,7 +165,10 @@ const InterviewPage = () => {
     const normalizedAnswer = transcript.toLowerCase()
     const keywordsMatched = keywords.filter((word) => normalizedAnswer.includes(word))
     const keywordsMissed = keywords.filter((word) => !normalizedAnswer.includes(word))
-    const clarityScore = Math.min(100, Math.max(45, transcript.length / 2))
+    const CLARITY_SCORE_MIN = 45
+    const CLARITY_SCORE_MAX = 100
+    const CLARITY_SCORE_DIVISOR = 2
+    const clarityScore = Math.min(CLARITY_SCORE_MAX, Math.max(CLARITY_SCORE_MIN, transcript.length / CLARITY_SCORE_DIVISOR))
     const eyeContactScore = eyeContact === 'good' ? 90 : eyeContact === 'poor' ? 55 : 65
     const score = Math.round(clarityScore * 0.65 + eyeContactScore * 0.35)
 
