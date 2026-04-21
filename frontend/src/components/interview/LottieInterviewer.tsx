@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
-import Lottie from 'lottie-react'
+import { useEffect, useRef } from 'react'
+import lottie from 'lottie-web'
 import interviewerAnimation from '../../assets/interviewer.json'
 
 type LottieInterviewerProps = {
@@ -19,25 +20,30 @@ const LottieInterviewer = ({
   totalQuestions,
   roundLabel,
 }: LottieInterviewerProps) => {
-  
-  // 🔥 SAFETY FIX: handle Vite JSON weirdness
-  const animationData =
-    (interviewerAnimation as any)?.default || interviewerAnimation
+  const animRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!animRef.current) return
+    const anim = lottie.loadAnimation({
+      container: animRef.current,
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      animationData: interviewerAnimation,
+    })
+    return () => anim.destroy()
+  }, [])
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-2xl">
-      
-      {/* Round Label */}
       <div className="absolute right-5 top-5 rounded-full bg-[#7C3AED]/30 px-3 py-1 text-xs font-medium text-[#F9FAFB]">
         {roundLabel}
       </div>
 
-      {/* Question Counter */}
       <p className="text-sm text-slate-300">
         Question {questionNumber} of {totalQuestions}
       </p>
 
-      {/* Lottie Animation */}
       <motion.div
         animate={
           isSpeaking
@@ -53,15 +59,9 @@ const LottieInterviewer = ({
         transition={{ duration: 1.6, repeat: isSpeaking ? Infinity : 0 }}
         className="mx-auto mt-5 max-w-[360px] rounded-full border border-[#00D4FF]/40 p-2"
       >
-        <Lottie
-          animationData={animationData}
-          loop
-          autoplay
-          className="mx-auto h-72 w-full"
-        />
+        <div ref={animRef} className="mx-auto h-72 w-full" />
       </motion.div>
 
-      {/* Voice Wave Animation */}
       {isSpeaking && (
         <div className="mt-4 flex items-end justify-center gap-2">
           {waveHeights.map((height, index) => (
@@ -69,17 +69,12 @@ const LottieInterviewer = ({
               key={height + index}
               className={`w-2 rounded-full bg-[#00D4FF] ${height}`}
               animate={{ scaleY: [0.5, 1.25, 0.6] }}
-              transition={{
-                duration: 0.8,
-                repeat: Infinity,
-                delay: index * 0.12,
-              }}
+              transition={{ duration: 0.8, repeat: Infinity, delay: index * 0.12 }}
             />
           ))}
         </div>
       )}
 
-      {/* Question Text */}
       <motion.div
         key={`${questionNumber}-${questionText}`}
         initial={{ opacity: 0, y: 8 }}
