@@ -44,7 +44,7 @@ export const useInterviewStore = create<InterviewState>((set) => ({
   setQuestions: (questions) => set({ questions, currentQuestionIndex: 0 }),
   setTranscript: (transcript) => set({ transcript }),
   setEyeContactScore: (eyeContactScore) => set({ eyeContactScore }),
-  addEvaluation: (evaluation) => set((state) => ({ evaluations: [...state.evaluations, evaluation], transcript: '' })),
+  addEvaluation: (evaluation) => set((state) => ({ evaluations: [...state.evaluations, evaluation] })),
   nextQuestion: () => set((state) => ({ currentQuestionIndex: state.currentQuestionIndex + 1, transcript: '' })),
   setReport: (report) => set({ report }),
   reset: () => set(initialState),

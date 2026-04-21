@@ -21,13 +21,13 @@ class EvaluateAnswerView(APIView):
 
         data = serializer.validated_data
         scores = evaluate_answer(
-            question=data.get('question', ''),
+            question=data['question'],
             answer=data.get('answer', ''),
             eye_contact_score=data.get('eye_contact_score', 50),
         )
         evaluation = AnswerEvaluation.objects.create(
             session=data.get('session'),
-            question=data.get('question', ''),
+            question=data['question'],
             answer=data.get('answer', ''),
             eye_contact_score=scores['eye_contact_score'],
             relevance_score=scores['relevance_score'],

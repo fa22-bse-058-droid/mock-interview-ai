@@ -17,7 +17,7 @@ const ReportPage = () => {
       <ScoreGauge score={overall} />
       <QuestionBreakdown items={evaluations} />
       <ImprovementTips tips={tips} />
-      <Link className="inline-block rounded bg-indigo-600 px-4 py-2" to="/setup">Try Again</Link>
+      <Link className="inline-block rounded bg-indigo-600 px-4 py-2 text-white" to="/setup">Try Again</Link>
     </div>
   )
 }

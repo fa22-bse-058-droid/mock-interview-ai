@@ -39,6 +39,7 @@ const InterviewPage = () => {
       eye_contact_score: eyeContactScore,
     })
     addEvaluation(result)
+    setTranscript('')
 
     if (currentQuestionIndex + 1 >= questions.length) {
       const report = await generateReport([...evaluations, result])

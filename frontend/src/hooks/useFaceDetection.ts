@@ -1,6 +1,9 @@
 import { useEffect } from 'react'
 import * as faceapi from 'face-api.js'
 
+const FACE_DETECTED_SCORE = 90
+const NO_FACE_DETECTED_SCORE = 40
+
 export const useFaceDetection = (
   videoRef: React.RefObject<HTMLVideoElement>,
   onScoreUpdate: (score: number) => void,
@@ -22,7 +25,7 @@ export const useFaceDetection = (
         if (!video || video.readyState < 2 || !mounted) return
 
         const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-        onScoreUpdate(detection ? 90 : 40)
+        onScoreUpdate(detection ? FACE_DETECTED_SCORE : NO_FACE_DETECTED_SCORE)
       }, 2000)
     }
 

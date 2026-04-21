@@ -5,6 +5,7 @@ type SpeechRecognitionResultItem = {
 }
 
 type SpeechRecognitionEventLike = {
+  resultIndex: number
   results: ArrayLike<ArrayLike<SpeechRecognitionResultItem>>
 }
 
@@ -43,9 +44,10 @@ export const useSpeech = () => {
 
     recognition.onresult = (event: SpeechRecognitionEventLike) => {
       const text = Array.from(event.results)
+        .slice(event.resultIndex)
         .map((result) => result[0]?.transcript ?? '')
         .join(' ')
-      setTranscript(text)
+      setTranscript((prev) => `${prev} ${text}`.trim())
     }
 
     recognition.onend = () => setListening(false)

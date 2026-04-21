@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import TypedDict
 
 import spacy
 
@@ -12,11 +12,19 @@ except Exception:
 FILLER_WORDS = {'um', 'uh', 'like', 'basically', 'actually', 'you know'}
 
 
+class EvaluationResult(TypedDict):
+    relevance_score: float
+    confidence_score: float
+    eye_contact_score: float
+    overall_score: float
+    feedback: str
+
+
 def _clamp(value: float, minimum: float = 0.0, maximum: float = 100.0) -> float:
     return max(minimum, min(value, maximum))
 
 
-def evaluate_answer(question: str, answer: str, eye_contact_score: float = 50) -> Dict[str, float | str]:
+def evaluate_answer(question: str, answer: str, eye_contact_score: float = 50) -> EvaluationResult:
     question_doc = NLP(question or '')
     answer_doc = NLP(answer or '')
 
