@@ -69,9 +69,11 @@ const InterviewSetupPage = () => {
     if (!('speechSynthesis' in window)) return
     await new Promise<void>((resolve) => {
       let resolved = false
+      let timeoutId: number | null = null
       const finish = () => {
         if (resolved) return
         resolved = true
+        if (timeoutId) window.clearTimeout(timeoutId)
         resolve()
       }
 
@@ -85,7 +87,7 @@ const InterviewSetupPage = () => {
         utterance.onend = finish
         utterance.onerror = finish
         window.speechSynthesis.speak(utterance)
-        window.setTimeout(finish, SPEECH_WARMUP_TIMEOUT_MS)
+        timeoutId = window.setTimeout(finish, SPEECH_WARMUP_TIMEOUT_MS)
       } catch {
         finish()
       }
