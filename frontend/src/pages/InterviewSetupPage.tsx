@@ -38,6 +38,7 @@ const questionLibrary: Record<string, string[]> = {
 const PARTICLE_SEED_MULTIPLIER = 9301
 const PARTICLE_SEED_INCREMENT = 49297
 const PARTICLE_SEED_MODULUS = 233280
+const SPEECH_WARMUP_TIMEOUT_MS = 350
 
 const seededValue = (seed: number) =>
   ((seed * PARTICLE_SEED_MULTIPLIER + PARTICLE_SEED_INCREMENT) % PARTICLE_SEED_MODULUS) / PARTICLE_SEED_MODULUS
@@ -84,7 +85,7 @@ const InterviewSetupPage = () => {
         utterance.onend = finish
         utterance.onerror = finish
         window.speechSynthesis.speak(utterance)
-        window.setTimeout(finish, 350)
+        window.setTimeout(finish, SPEECH_WARMUP_TIMEOUT_MS)
       } catch {
         finish()
       }
