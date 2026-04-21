@@ -6,7 +6,10 @@
     "module": "esnext",
     "types": ["vite/client"],
     "skipLibCheck": true,
+
     "resolveJsonModule": true,
+    "esModuleInterop": true,
+
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {

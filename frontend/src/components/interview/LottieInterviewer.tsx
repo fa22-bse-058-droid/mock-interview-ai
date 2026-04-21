@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import Lottie from 'lottie-react'
-import interviewerAnimation from '@/assets/interviewer.json'
+import interviewerAnimation from '../../assets/interviewer.json'
 
 type LottieInterviewerProps = {
   isSpeaking: boolean
@@ -18,52 +18,86 @@ const LottieInterviewer = ({
   questionNumber,
   totalQuestions,
   roundLabel,
-}: LottieInterviewerProps) => (
-  <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-2xl">
-    <div className="absolute right-5 top-5 rounded-full bg-[#7C3AED]/30 px-3 py-1 text-xs font-medium text-[#F9FAFB]">
-      {roundLabel}
-    </div>
+}: LottieInterviewerProps) => {
+  
+  // 🔥 SAFETY FIX: handle Vite JSON weirdness
+  const animationData =
+    (interviewerAnimation as any)?.default || interviewerAnimation
 
-    <p className="text-sm text-slate-300">Question {questionNumber} of {totalQuestions}</p>
-
-    <motion.div
-      animate={isSpeaking ? { boxShadow: ['0 0 0px #00D4FF', '0 0 40px rgba(0,212,255,0.65)', '0 0 0px #00D4FF'] } : { boxShadow: '0 0 0px #00D4FF' }}
-      transition={{ duration: 1.6, repeat: isSpeaking ? Infinity : 0 }}
-      className="mx-auto mt-5 max-w-[360px] rounded-full border border-[#00D4FF]/40 p-2"
-    >
-      <Lottie animationData={interviewerAnimation} loop={true} autoplay={true} className="mx-auto h-72 w-full" />
-    </motion.div>
-
-    {isSpeaking && (
-      <div className="mt-4 flex items-end justify-center gap-2">
-        {waveHeights.map((height, index) => (
-          <motion.span
-            key={height + index}
-            className={`w-2 rounded-full bg-[#00D4FF] ${height}`}
-            animate={{ scaleY: [0.5, 1.25, 0.6] }}
-            transition={{ duration: 0.8, repeat: Infinity, delay: index * 0.12 }}
-          />
-        ))}
+  return (
+    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-2xl">
+      
+      {/* Round Label */}
+      <div className="absolute right-5 top-5 rounded-full bg-[#7C3AED]/30 px-3 py-1 text-xs font-medium text-[#F9FAFB]">
+        {roundLabel}
       </div>
-    )}
 
-    <motion.div
-      key={`${questionNumber}-${questionText}`}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: 'easeOut' }}
-      className="mt-6 rounded-2xl border border-white/10 bg-[#0A0F1E]/70 p-4"
-    >
-      <motion.p
-        initial={{ width: 0 }}
-        animate={{ width: '100%' }}
-        transition={{ duration: 1.1, ease: 'linear' }}
-        className="overflow-hidden whitespace-nowrap text-sm text-[#F9FAFB]"
+      {/* Question Counter */}
+      <p className="text-sm text-slate-300">
+        Question {questionNumber} of {totalQuestions}
+      </p>
+
+      {/* Lottie Animation */}
+      <motion.div
+        animate={
+          isSpeaking
+            ? {
+                boxShadow: [
+                  '0 0 0px #00D4FF',
+                  '0 0 40px rgba(0,212,255,0.65)',
+                  '0 0 0px #00D4FF',
+                ],
+              }
+            : { boxShadow: '0 0 0px #00D4FF' }
+        }
+        transition={{ duration: 1.6, repeat: isSpeaking ? Infinity : 0 }}
+        className="mx-auto mt-5 max-w-[360px] rounded-full border border-[#00D4FF]/40 p-2"
       >
-        {questionText}
-      </motion.p>
-    </motion.div>
-  </div>
-)
+        <Lottie
+          animationData={animationData}
+          loop
+          autoplay
+          className="mx-auto h-72 w-full"
+        />
+      </motion.div>
+
+      {/* Voice Wave Animation */}
+      {isSpeaking && (
+        <div className="mt-4 flex items-end justify-center gap-2">
+          {waveHeights.map((height, index) => (
+            <motion.span
+              key={height + index}
+              className={`w-2 rounded-full bg-[#00D4FF] ${height}`}
+              animate={{ scaleY: [0.5, 1.25, 0.6] }}
+              transition={{
+                duration: 0.8,
+                repeat: Infinity,
+                delay: index * 0.12,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Question Text */}
+      <motion.div
+        key={`${questionNumber}-${questionText}`}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: 'easeOut' }}
+        className="mt-6 rounded-2xl border border-white/10 bg-[#0A0F1E]/70 p-4"
+      >
+        <motion.p
+          initial={{ width: 0 }}
+          animate={{ width: '100%' }}
+          transition={{ duration: 1.1, ease: 'linear' }}
+          className="overflow-hidden whitespace-nowrap text-sm text-[#F9FAFB]"
+        >
+          {questionText}
+        </motion.p>
+      </motion.div>
+    </div>
+  )
+}
 
 export default LottieInterviewer
